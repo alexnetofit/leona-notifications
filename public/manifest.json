@@ -1,0 +1,18 @@
+{
+  "name": "Leona Notifications",
+  "short_name": "Leona",
+  "description": "Receba notificações em tempo real via webhooks",
+  "start_url": "/dashboard",
+  "display": "standalone",
+  "background_color": "#202123",
+  "theme_color": "#10a37f",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/image/logo.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
