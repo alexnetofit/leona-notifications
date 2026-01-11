@@ -17,8 +17,8 @@ self.addEventListener('push', (event) => {
   let data = {
     title: 'Leona Notifications',
     body: 'Você recebeu uma nova notificação',
-    icon: '/image/notification_logo.svg',
-    badge: '/image/notification_logo.svg',
+    icon: '/image/notification_logo.png',
+    badge: '/image/notification_logo.png',
     data: { url: '/dashboard' }
   };
 
@@ -32,8 +32,8 @@ self.addEventListener('push', (event) => {
 
   const options = {
     body: data.body,
-    icon: data.icon || '/image/notification_logo.svg',
-    badge: data.badge || '/image/notification_logo.svg',
+    icon: data.icon || '/image/notification_logo.png',
+    badge: data.badge || '/image/notification_logo.png',
     vibrate: [200, 100, 200],
     data: data.data || { url: '/dashboard' },
     actions: [

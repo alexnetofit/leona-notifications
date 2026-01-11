@@ -26,7 +26,7 @@ export default function Header({ showLogout = true }: HeaderProps) {
           <Link href="/dashboard" className="flex items-center gap-3">
             <div className="w-8 h-8 relative">
               <Image
-                src="/image/logo.svg"
+                src="/image/logo.png"
                 alt="Leona"
                 fill
                 className="object-contain"

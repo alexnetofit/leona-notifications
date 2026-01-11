@@ -45,8 +45,8 @@ export function buildNotificationPayload(
   return {
     title,
     body,
-    icon: '/image/notification_logo.svg',
-    badge: '/image/notification_logo.svg',
+    icon: '/image/notification_logo.png',
+    badge: '/image/notification_logo.png',
     data: {
       url: '/dashboard',
     },

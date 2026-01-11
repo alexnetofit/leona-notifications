@@ -49,7 +49,7 @@ export default function LoginPage() {
         <div className="text-center mb-10">
           <div className="w-20 h-20 mx-auto mb-6 relative">
             <Image
-              src="/image/logo.svg"
+              src="/image/logo.png"
               alt="Leona"
               fill
               className="object-contain"
