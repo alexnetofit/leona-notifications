@@ -36,6 +36,7 @@ export default function NewEndpointPage() {
 
   const [name, setName] = useState('');
   const [type, setType] = useState<EndpointType>('disconnected');
+  const [saleTitle, setSaleTitle] = useState('🤑 Venda Aprovada!');
   const [genericTitle, setGenericTitle] = useState('');
   const [genericBody, setGenericBody] = useState('');
   const [loading, setLoading] = useState(false);
@@ -57,14 +58,25 @@ export default function NewEndpointPage() {
       const endpointId = generateEndpointId();
       const secret = generateSecret();
 
+      // Determine title based on type
+      let titleToSave = null;
+      let bodyToSave = null;
+
+      if (type === 'sale_approved') {
+        titleToSave = saleTitle || '🤑 Venda Aprovada!';
+      } else if (type === 'generic') {
+        titleToSave = genericTitle;
+        bodyToSave = genericBody;
+      }
+
       const { error: insertError } = await supabase.from('endpoints').insert({
         id: endpointId,
         user_id: user.id,
         name,
         type,
         secret,
-        generic_title: type === 'generic' ? genericTitle : null,
-        generic_body: type === 'generic' ? genericBody : null,
+        generic_title: titleToSave,
+        generic_body: bodyToSave,
       });
 
       if (insertError) throw insertError;
@@ -149,6 +161,28 @@ export default function NewEndpointPage() {
             </div>
           </div>
 
+          {/* Sale Approved Title Field */}
+          {type === 'sale_approved' && (
+            <div className="card space-y-4">
+              <div>
+                <label htmlFor="saleTitle" className="block text-sm font-medium text-dark-200 mb-2">
+                  Título da Notificação
+                </label>
+                <input
+                  id="saleTitle"
+                  type="text"
+                  value={saleTitle}
+                  onChange={(e) => setSaleTitle(e.target.value)}
+                  placeholder="🤑 Venda Aprovada!"
+                  className="input"
+                />
+                <p className="text-xs text-dark-500 mt-2">
+                  O corpo será: &quot;Valor: [valor da venda]&quot;
+                </p>
+              </div>
+            </div>
+          )}
+
           {/* Generic Fields */}
           {type === 'generic' && (
             <div className="card space-y-4">
@@ -197,7 +231,7 @@ export default function NewEndpointPage() {
                 <div>
                   <p className="font-medium text-dark-100">
                     {type === 'disconnected' && '🚨 Atenção! [Nome] desconectou!'}
-                    {type === 'sale_approved' && '🤑 Venda Aprovada!'}
+                    {type === 'sale_approved' && (saleTitle || '🤑 Venda Aprovada!')}
                     {type === 'generic' && (genericTitle || 'Título da notificação')}
                   </p>
                   <p className="text-sm text-dark-400 mt-0.5">

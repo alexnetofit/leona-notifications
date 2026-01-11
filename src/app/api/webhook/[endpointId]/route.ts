@@ -97,7 +97,7 @@ async function handleWebhook(request: NextRequest, endpointId: string) {
     }
     case 'sale_approved': {
       const valor = query.valor || '(não informado)';
-      title = '🤑 Venda Aprovada!';
+      title = typedEndpoint.generic_title || '🤑 Venda Aprovada!';
       body = `Valor: ${valor}`;
       break;
     }

@@ -10,7 +10,13 @@ interface EndpointCardProps {
 }
 
 export default function EndpointCard({ endpoint, appUrl }: EndpointCardProps) {
-  const webhookUrl = `${appUrl}/api/webhook/${endpoint.id}?token=${endpoint.secret}`;
+  // Build webhook URL based on type
+  let webhookUrl = `${appUrl}/api/webhook/${endpoint.id}?token=${endpoint.secret}`;
+  
+  // Add &valor={valor} for sale_approved type
+  if (endpoint.type === 'sale_approved') {
+    webhookUrl += '&valor={valor}';
+  }
 
   return (
     <div className="card card-hover">
@@ -28,8 +34,24 @@ export default function EndpointCard({ endpoint, appUrl }: EndpointCardProps) {
           <div className="mt-1 p-3 bg-dark-900 rounded-lg border border-dark-700">
             <code className="text-sm text-accent break-all">{webhookUrl}</code>
           </div>
+          {endpoint.type === 'sale_approved' && (
+            <p className="text-xs text-dark-500 mt-2">
+              Substitua <code className="text-accent">{'{valor}'}</code> pelo valor da venda (ex: R$197,00)
+            </p>
+          )}
         </div>
 
+        {/* Show custom title for sale_approved */}
+        {endpoint.type === 'sale_approved' && endpoint.generic_title && (
+          <div className="pt-3 border-t border-dark-700">
+            <div>
+              <label className="text-xs text-dark-500 uppercase tracking-wide">Título da Notificação</label>
+              <p className="mt-1 text-sm text-dark-200">{endpoint.generic_title}</p>
+            </div>
+          </div>
+        )}
+
+        {/* Show custom title and body for generic */}
         {endpoint.type === 'generic' && endpoint.generic_title && (
           <div className="pt-3 border-t border-dark-700">
             <div className="grid grid-cols-2 gap-4">
