@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, ReactNode } from 'react';
+import { useState, useEffect, ReactNode, useMemo } from 'react';
 import Image from 'next/image';
 
 interface BeforeInstallPromptEvent extends Event {
@@ -12,26 +12,30 @@ interface RequirePWAProps {
   children: ReactNode;
 }
 
+// Cache detection results to avoid recalculating
+let cachedDetection: { isMobile: boolean; isStandalone: boolean; isIOS: boolean } | null = null;
+
+function detectEnvironment() {
+  if (cachedDetection) return cachedDetection;
+  
+  const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+  const isStandalone = window.matchMedia('(display-mode: standalone)').matches ||
+    (window.navigator as Navigator & { standalone?: boolean }).standalone === true;
+  const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !(window as unknown as { MSStream?: unknown }).MSStream;
+  
+  cachedDetection = { isMobile, isStandalone, isIOS };
+  return cachedDetection;
+}
+
 export default function RequirePWA({ children }: RequirePWAProps) {
   const [isLoading, setIsLoading] = useState(true);
-  const [isMobile, setIsMobile] = useState(false);
-  const [isStandalone, setIsStandalone] = useState(false);
-  const [isIOS, setIsIOS] = useState(false);
+  const [detection, setDetection] = useState<{ isMobile: boolean; isStandalone: boolean; isIOS: boolean } | null>(null);
   const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null);
 
   useEffect(() => {
-    // Check if mobile
-    const mobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-    setIsMobile(mobile);
-
-    // Check if standalone (PWA)
-    const standalone = window.matchMedia('(display-mode: standalone)').matches ||
-      (window.navigator as Navigator & { standalone?: boolean }).standalone === true;
-    setIsStandalone(standalone);
-
-    // Check if iOS
-    const ios = /iPad|iPhone|iPod/.test(navigator.userAgent) && !(window as unknown as { MSStream?: unknown }).MSStream;
-    setIsIOS(ios);
+    // Use cached detection or calculate once
+    const env = detectEnvironment();
+    setDetection(env);
 
     // Listen for install prompt (Android)
     const handleBeforeInstallPrompt = (e: Event) => {
@@ -47,6 +51,12 @@ export default function RequirePWA({ children }: RequirePWAProps) {
       window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
     };
   }, []);
+
+  // Memoize the decision to show install screen
+  const shouldShowInstallScreen = useMemo(() => {
+    if (!detection) return false;
+    return detection.isMobile && !detection.isStandalone;
+  }, [detection]);
 
   const handleInstall = async () => {
     if (!deferredPrompt) return;
@@ -72,7 +82,7 @@ export default function RequirePWA({ children }: RequirePWAProps) {
   }
 
   // Desktop or PWA - render normally
-  if (!isMobile || isStandalone) {
+  if (!shouldShowInstallScreen) {
     return <>{children}</>;
   }
 
@@ -109,7 +119,7 @@ export default function RequirePWA({ children }: RequirePWAProps) {
 
         {/* Instructions */}
         <div className="w-full max-w-sm">
-          {isIOS ? (
+          {detection?.isIOS ? (
             // iOS Instructions
             <div className="card text-center">
               <p className="text-dark-100 text-sm mb-3">
@@ -157,7 +167,7 @@ export default function RequirePWA({ children }: RequirePWAProps) {
       </div>
 
       {/* iOS: Arrow pointing to share button at bottom */}
-      {isIOS && (
+      {detection?.isIOS && (
         <div className="pb-16 flex flex-col items-center">
           {/* iOS Share icon (square with arrow up) */}
           <div className="w-14 h-14 rounded-2xl bg-dark-800/80 border border-white/10 flex items-center justify-center mb-3">

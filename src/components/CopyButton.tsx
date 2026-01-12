@@ -10,20 +10,38 @@ interface CopyButtonProps {
 export default function CopyButton({ text, className = '' }: CopyButtonProps) {
   const [copied, setCopied] = useState(false);
 
-  const handleCopy = async () => {
+  const handleCopy = async (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+
     try {
       await navigator.clipboard.writeText(text);
       setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
-    } catch (err) {
-      console.error('Failed to copy:', err);
+    } catch {
+      // Fallback para browsers antigos
+      try {
+        const textarea = document.createElement('textarea');
+        textarea.value = text;
+        textarea.style.position = 'fixed';
+        textarea.style.left = '-9999px';
+        document.body.appendChild(textarea);
+        textarea.select();
+        document.execCommand('copy');
+        document.body.removeChild(textarea);
+        setCopied(true);
+      } catch (fallbackErr) {
+        console.error('Failed to copy:', fallbackErr);
+      }
     }
+    
+    setTimeout(() => setCopied(false), 2000);
   };
 
   return (
     <button
+      type="button"
       onClick={handleCopy}
-      className={`inline-flex items-center gap-2 px-3 py-1.5 text-sm font-medium rounded-lg transition-all duration-300 ${
+      className={`relative z-20 inline-flex items-center gap-2 px-3 py-1.5 text-sm font-medium rounded-lg transition-all duration-300 cursor-pointer ${
         copied
           ? 'bg-accent/20 text-accent-light shadow-glow'
           : 'bg-dark-800/50 hover:bg-dark-700/50 text-dark-300 hover:text-dark-50 border border-white/5 hover:border-accent/30'

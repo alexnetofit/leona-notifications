@@ -1,5 +1,6 @@
 'use client';
 
+import { useMemo } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter, usePathname } from 'next/navigation';
@@ -12,7 +13,7 @@ interface HeaderProps {
 export default function Header({ showLogout = true }: HeaderProps) {
   const router = useRouter();
   const pathname = usePathname();
-  const supabase = createClient();
+  const supabase = useMemo(() => createClient(), []);
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
