@@ -77,6 +77,9 @@ async function handleWebhook(request: NextRequest, endpointId: string) {
     }
   });
 
+  // Check if this is a test notification
+  const isTest = url.searchParams.get('test') === 'true';
+
   // Build notification based on endpoint type
   let title: string;
   let body: string;
@@ -109,6 +112,11 @@ async function handleWebhook(request: NextRequest, endpointId: string) {
     default:
       title = '🔔 Notificação';
       body = 'Você recebeu uma nova notificação.';
+  }
+
+  // Add [TEST] prefix if this is a test notification
+  if (isTest) {
+    title = `[TEST] ${title}`;
   }
 
   // Get user's push subscriptions

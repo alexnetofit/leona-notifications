@@ -30,10 +30,10 @@ export default function EndpointCard({ endpoint, appUrl }: EndpointCardProps) {
     webhookUrl += '&valor={valor}';
   }
 
-  // Build test URL (with example value for sale_approved)
+  // Build test URL (with example value for sale_approved and test flag)
   const testUrl = endpoint.type === 'sale_approved'
-    ? `${appUrl}/api/webhook/${endpoint.id}?token=${endpoint.secret}&valor=R$197,00`
-    : `${appUrl}/api/webhook/${endpoint.id}?token=${endpoint.secret}`;
+    ? `${appUrl}/api/webhook/${endpoint.id}?token=${endpoint.secret}&valor=R$197,00&test=true`
+    : `${appUrl}/api/webhook/${endpoint.id}?token=${endpoint.secret}&test=true`;
 
   const handleTest = async () => {
     setTesting(true);
