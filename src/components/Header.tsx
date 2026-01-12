@@ -24,8 +24,8 @@ export default function Header({ showLogout = true }: HeaderProps) {
 
   return (
     <>
-      {/* Header Desktop */}
-      <header className="glass-header sticky top-0 z-40">
+      {/* Header Desktop Only */}
+      <header className="glass-header sticky top-0 z-40 hidden sm:block">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             <Link href="/dashboard" className="flex items-center gap-3 group">
@@ -46,7 +46,7 @@ export default function Header({ showLogout = true }: HeaderProps) {
 
             {/* Desktop Navigation */}
             {showLogout && (
-              <nav className="hidden sm:flex items-center gap-2">
+              <nav className="flex items-center gap-2">
                 <Link
                   href="/dashboard"
                   className={`px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
