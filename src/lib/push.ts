@@ -40,15 +40,13 @@ export async function sendPushNotification(
 
 export function buildNotificationPayload(
   title: string,
-  body: string,
-  iconNumber: number = 1
+  body: string
 ): NotificationPayload {
-  const iconPath = `/image/notification_logo_${iconNumber}.png`;
   return {
     title,
     body,
-    icon: iconPath,
-    badge: iconPath,
+    icon: '/image/notification_logo_1.png',
+    badge: '/image/notification_logo_1.png',
     data: {
       url: '/dashboard',
     },

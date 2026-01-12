@@ -126,7 +126,7 @@ async function handleWebhook(request: NextRequest, endpointId: string) {
   let errorMessage: string | null = null;
 
   if (subscriptions && subscriptions.length > 0) {
-    const notificationPayload = buildNotificationPayload(title, body, typedEndpoint.notification_icon || 1);
+    const notificationPayload = buildNotificationPayload(title, body);
     
     const results = await Promise.all(
       (subscriptions as PushSubscription[]).map(async (sub) => {

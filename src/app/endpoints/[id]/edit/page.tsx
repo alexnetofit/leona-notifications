@@ -61,7 +61,6 @@ export default function EditEndpointPage() {
   const [saleTitle, setSaleTitle] = useState('');
   const [genericTitle, setGenericTitle] = useState('');
   const [genericBody, setGenericBody] = useState('');
-  const [notificationIcon, setNotificationIcon] = useState(1);
 
   useEffect(() => {
     async function loadEndpoint() {
@@ -79,7 +78,6 @@ export default function EditEndpointPage() {
         setEndpoint(ep);
         setName(ep.name);
         setType(ep.type);
-        setNotificationIcon(ep.notification_icon || 1);
 
         if (ep.type === 'sale_approved') {
           setSaleTitle(ep.generic_title || '🤑 Venda Aprovada!');
@@ -121,7 +119,6 @@ export default function EditEndpointPage() {
           type,
           generic_title: titleToSave,
           generic_body: bodyToSave,
-          notification_icon: notificationIcon,
         })
         .eq('id', endpointId);
 
@@ -309,47 +306,6 @@ export default function EditEndpointPage() {
             </div>
           )}
 
-          {/* Notification Icon Selection */}
-          <div className="card">
-            <label className="block text-sm font-medium text-dark-100 mb-4">
-              Ícone da Notificação
-            </label>
-            <div className="grid grid-cols-4 gap-3">
-              {[1, 2, 3, 4].map((iconNum) => (
-                <label
-                  key={iconNum}
-                  className={`relative aspect-square rounded-xl border-2 cursor-pointer transition-all duration-300 overflow-hidden ${
-                    notificationIcon === iconNum
-                      ? 'border-accent shadow-glow'
-                      : 'border-white/10 hover:border-white/30'
-                  }`}
-                >
-                  <input
-                    type="radio"
-                    name="notificationIcon"
-                    value={iconNum}
-                    checked={notificationIcon === iconNum}
-                    onChange={() => setNotificationIcon(iconNum)}
-                    className="sr-only"
-                  />
-                  <Image
-                    src={`/image/notification_logo_${iconNum}.png`}
-                    alt={`Ícone ${iconNum}`}
-                    fill
-                    className="object-cover"
-                  />
-                  {notificationIcon === iconNum && (
-                    <div className="absolute top-1 right-1 w-5 h-5 rounded-full bg-accent flex items-center justify-center">
-                      <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
-                      </svg>
-                    </div>
-                  )}
-                </label>
-              ))}
-            </div>
-          </div>
-
           {/* Preview */}
           <div className="card border-accent/20">
             <h3 className="text-sm font-medium text-dark-300 mb-3 flex items-center gap-2">
@@ -363,7 +319,7 @@ export default function EditEndpointPage() {
               <div className="flex items-start gap-3">
                 <div className="w-10 h-10 rounded-xl overflow-hidden flex-shrink-0 relative">
                   <Image
-                    src={`/image/notification_logo_${notificationIcon}.png`}
+                    src="/image/notification_logo_1.png"
                     alt="Ícone"
                     fill
                     className="object-cover"
