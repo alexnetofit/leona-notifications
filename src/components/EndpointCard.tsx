@@ -21,7 +21,7 @@ export default function EndpointCard({ endpoint, appUrl }: EndpointCardProps) {
   // Get icon and color based on endpoint type
   const getTypeStyles = () => {
     switch (endpoint.type) {
-      case 'disconnect':
+      case 'disconnected':
         return {
           iconBg: 'from-red-500/20 to-red-600/20',
           iconColor: 'text-red-400',
