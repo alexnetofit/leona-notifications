@@ -303,18 +303,32 @@ export default function LoginPage() {
                 </p>
                 
                 {/* OTP Inputs */}
-                <div className="flex justify-center gap-2 sm:gap-3">
+                <div className="flex justify-center gap-2 sm:gap-3 relative z-10">
                   {otp.map((digit, index) => (
                     <input
                       key={index}
                       ref={(el) => { inputRefs.current[index] = el; }}
                       type="text"
                       inputMode="numeric"
-                      maxLength={6}
+                      autoComplete="one-time-code"
+                      maxLength={1}
                       value={digit}
                       onChange={(e) => handleOtpChange(index, e.target.value)}
                       onKeyDown={(e) => handleOtpKeyDown(index, e)}
-                      className="w-11 h-14 sm:w-12 sm:h-16 text-center text-2xl font-bold bg-dark-800/50 border border-dark-600/50 rounded-xl text-dark-50 focus:outline-none focus:border-accent/50 transition-all"
+                      onPaste={(e) => {
+                        e.preventDefault();
+                        const pastedData = e.clipboardData.getData('text').replace(/\D/g, '').slice(0, 6);
+                        if (pastedData) {
+                          const newOtp = [...otp];
+                          pastedData.split('').forEach((char, i) => {
+                            if (i < 6) newOtp[i] = char;
+                          });
+                          setOtp(newOtp);
+                          const nextIndex = Math.min(pastedData.length, 5);
+                          inputRefs.current[nextIndex]?.focus();
+                        }
+                      }}
+                      className="w-11 h-14 sm:w-12 sm:h-16 text-center text-2xl font-bold bg-dark-800/50 border border-dark-600/50 rounded-xl text-dark-50 focus:outline-none focus:border-accent/50 focus:ring-2 focus:ring-accent/20 transition-all cursor-text"
                       disabled={loading}
                     />
                   ))}
