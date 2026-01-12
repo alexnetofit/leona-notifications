@@ -138,22 +138,26 @@ export default function EndpointCard({ endpoint, appUrl }: EndpointCardProps) {
             <span className="text-sm text-dark-400">{formatEndpointType(endpoint.type)}</span>
           </div>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 relative z-10">
           <Link
             href={`/endpoints/${endpoint.id}/edit`}
-            className="p-2 rounded-lg text-dark-400 hover:text-accent-light hover:bg-accent/10 transition-all"
+            className="p-2 rounded-lg text-dark-400 hover:text-accent-light hover:bg-accent/10 transition-all cursor-pointer"
             title="Editar"
+            onClick={(e) => e.stopPropagation()}
           >
-            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
             </svg>
           </Link>
           <button
-            onClick={() => setShowDeleteConfirm(true)}
-            className="p-2 rounded-lg text-dark-400 hover:text-red-400 hover:bg-red-500/10 transition-all"
+            onClick={(e) => {
+              e.stopPropagation();
+              setShowDeleteConfirm(true);
+            }}
+            className="p-2 rounded-lg text-dark-400 hover:text-red-400 hover:bg-red-500/10 transition-all cursor-pointer"
             title="Excluir"
           >
-            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
             </svg>
           </button>
@@ -187,11 +191,11 @@ export default function EndpointCard({ endpoint, appUrl }: EndpointCardProps) {
       <div className="space-y-3">
         <div>
           <div className="flex items-center justify-between">
-            <label className="text-xs text-dark-400 uppercase tracking-wide font-medium">URL do Webhook</label>
+            <label className="text-xs text-dark-400 uppercase tracking-wide font-medium">URL</label>
             <CopyButton text={webhookUrl} />
           </div>
-          <div className="mt-1.5 p-3 bg-dark-900/50 rounded-lg border border-white/5">
-            <code className="text-sm text-accent-light break-all">{webhookUrl}</code>
+          <div className="mt-1.5 p-3 bg-dark-900/50 rounded-lg border border-white/5 overflow-x-auto">
+            <code className="text-sm text-accent-light whitespace-nowrap">{webhookUrl}</code>
           </div>
           {endpoint.type === 'sale_approved' && (
             <p className="text-xs text-dark-400 mt-2">
@@ -272,12 +276,9 @@ export default function EndpointCard({ endpoint, appUrl }: EndpointCardProps) {
         </div>
       </div>
 
-      <div className="mt-3 flex items-center justify-between">
+      <div className="mt-3">
         <span className="text-xs text-dark-400">
           Criado em {new Date(endpoint.created_at).toLocaleDateString('pt-BR')}
-        </span>
-        <span className="text-xs text-dark-500 font-mono bg-dark-900/50 px-2 py-1 rounded">
-          {endpoint.id.slice(0, 8)}...
         </span>
       </div>
     </div>

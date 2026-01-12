@@ -32,7 +32,7 @@ export default async function DashboardPage() {
       
       <Header />
       
-      <main className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 relative z-10">
+      <main className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 pb-24 sm:pb-8 relative z-10">
         {/* Push Permission Banner */}
         <section className="mb-8">
           <PushPermission />
