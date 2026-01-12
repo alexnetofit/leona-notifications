@@ -8,6 +8,7 @@ export interface Endpoint {
   secret: string;
   generic_title: string | null;
   generic_body: string | null;
+  notification_icon: number;
   created_at: string;
 }
 

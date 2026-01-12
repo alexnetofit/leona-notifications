@@ -58,7 +58,7 @@ export default function LoginPage() {
           <div className="w-24 h-24 mx-auto mb-6 relative animate-float">
             <div className="absolute inset-0 rounded-full bg-accent/20 blur-xl" />
             <Image
-              src="/image/logo.png"
+              src="/image/logo_login.png"
               alt="Leona"
               fill
               className="object-contain relative z-10 drop-shadow-[0_0_15px_rgba(168,85,247,0.5)]"

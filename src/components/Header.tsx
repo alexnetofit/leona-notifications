@@ -30,7 +30,7 @@ export default function Header({ showLogout = true }: HeaderProps) {
             <div className="w-9 h-9 relative">
               <div className="absolute inset-0 rounded-full bg-accent/20 blur-md group-hover:bg-accent/30 transition-all" />
               <Image
-                src="/image/logo.png"
+                src="/image/logo_login.png"
                 alt="Leona"
                 fill
                 className="object-contain relative z-10"

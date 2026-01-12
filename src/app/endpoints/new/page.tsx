@@ -2,6 +2,7 @@
 
 import { useState, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
+import Image from 'next/image';
 import Header from '@/components/Header';
 import { createClient } from '@/lib/supabase/client';
 import { generateEndpointId, generateSecret } from '@/lib/utils';
@@ -54,6 +55,7 @@ export default function NewEndpointPage() {
   const [saleTitle, setSaleTitle] = useState('🤑 Venda Aprovada!');
   const [genericTitle, setGenericTitle] = useState('');
   const [genericBody, setGenericBody] = useState('');
+  const [notificationIcon, setNotificationIcon] = useState(1);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -92,6 +94,7 @@ export default function NewEndpointPage() {
         secret,
         generic_title: titleToSave,
         generic_body: bodyToSave,
+        notification_icon: notificationIcon,
       });
 
       if (insertError) throw insertError;
@@ -251,6 +254,50 @@ export default function NewEndpointPage() {
             </div>
           )}
 
+          {/* Notification Icon Selection */}
+          <div className="card">
+            <label className="block text-sm font-medium text-dark-100 mb-4">
+              Ícone da Notificação
+            </label>
+            <div className="grid grid-cols-4 gap-3">
+              {[1, 2, 3, 4].map((iconNum) => (
+                <label
+                  key={iconNum}
+                  className={`relative aspect-square rounded-xl border-2 cursor-pointer transition-all duration-300 overflow-hidden ${
+                    notificationIcon === iconNum
+                      ? 'border-accent shadow-glow'
+                      : 'border-white/10 hover:border-white/30'
+                  }`}
+                >
+                  <input
+                    type="radio"
+                    name="notificationIcon"
+                    value={iconNum}
+                    checked={notificationIcon === iconNum}
+                    onChange={() => setNotificationIcon(iconNum)}
+                    className="sr-only"
+                  />
+                  <Image
+                    src={`/image/notification_logo_${iconNum}.png`}
+                    alt={`Ícone ${iconNum}`}
+                    fill
+                    className="object-cover"
+                  />
+                  {notificationIcon === iconNum && (
+                    <div className="absolute top-1 right-1 w-5 h-5 rounded-full bg-accent flex items-center justify-center">
+                      <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                      </svg>
+                    </div>
+                  )}
+                </label>
+              ))}
+            </div>
+            <p className="text-xs text-dark-400 mt-3">
+              Este ícone aparecerá nas notificações push
+            </p>
+          </div>
+
           {/* Preview */}
           <div className="card border-accent/20">
             <h3 className="text-sm font-medium text-dark-300 mb-3 flex items-center gap-2">
@@ -262,10 +309,13 @@ export default function NewEndpointPage() {
             </h3>
             <div className="bg-dark-900/50 rounded-xl p-4 border border-white/5">
               <div className="flex items-start gap-3">
-                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-accent/20 to-accent-bright/20 flex items-center justify-center flex-shrink-0">
-                  <svg className="w-5 h-5 text-accent-light" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
-                  </svg>
+                <div className="w-10 h-10 rounded-xl overflow-hidden flex-shrink-0 relative">
+                  <Image
+                    src={`/image/notification_logo_${notificationIcon}.png`}
+                    alt="Ícone"
+                    fill
+                    className="object-cover"
+                  />
                 </div>
                 <div>
                   <p className="font-medium text-dark-50">

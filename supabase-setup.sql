@@ -12,8 +12,12 @@ CREATE TABLE IF NOT EXISTS endpoints (
   secret TEXT NOT NULL,
   generic_title TEXT,
   generic_body TEXT,
+  notification_icon INTEGER DEFAULT 1,
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
+
+-- MIGRAÇÃO: Se a tabela já existe, adicione a coluna notification_icon
+-- ALTER TABLE endpoints ADD COLUMN IF NOT EXISTS notification_icon INTEGER DEFAULT 1;
 
 -- Tabela de subscriptions (dispositivos para push)
 CREATE TABLE IF NOT EXISTS push_subscriptions (
