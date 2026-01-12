@@ -4,7 +4,6 @@ import { createClient } from '@/lib/supabase/server';
 import Header from '@/components/Header';
 import EndpointCard from '@/components/EndpointCard';
 import PushPermission from '@/components/PushPermission';
-import InstallPromptWrapper from '@/components/InstallPromptWrapper';
 import type { Endpoint } from '@/types';
 
 export default async function DashboardPage() {
@@ -128,9 +127,6 @@ export default async function DashboardPage() {
           </div>
         </section>
       </main>
-      
-      {/* Install Prompt */}
-      <InstallPromptWrapper />
     </div>
   );
 }
