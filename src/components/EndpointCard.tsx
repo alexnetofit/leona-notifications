@@ -166,21 +166,31 @@ export default function EndpointCard({ endpoint, appUrl }: EndpointCardProps) {
 
       {/* Delete Confirmation */}
       {showDeleteConfirm && (
-        <div className="mb-4 p-4 rounded-lg bg-red-500/10 border border-red-500/20">
+        <div className="mb-4 p-4 rounded-lg bg-red-500/10 border border-red-500/20 relative z-20">
           <p className="text-sm text-red-300 mb-3">
             Tem certeza que deseja excluir esta notificação?
           </p>
           <div className="flex gap-2">
             <button
-              onClick={handleDelete}
+              type="button"
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                handleDelete();
+              }}
               disabled={deleting}
-              className="flex-1 px-3 py-2 rounded-lg bg-red-500/20 text-red-400 hover:bg-red-500/30 text-sm font-medium transition-all disabled:opacity-50"
+              className="flex-1 px-3 py-2 rounded-lg bg-red-500/20 text-red-400 hover:bg-red-500/30 text-sm font-medium transition-all disabled:opacity-50 cursor-pointer"
             >
               {deleting ? 'Excluindo...' : 'Sim, excluir'}
             </button>
             <button
-              onClick={() => setShowDeleteConfirm(false)}
-              className="flex-1 px-3 py-2 rounded-lg bg-dark-700/50 text-dark-300 hover:bg-dark-700 text-sm font-medium transition-all"
+              type="button"
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                setShowDeleteConfirm(false);
+              }}
+              className="flex-1 px-3 py-2 rounded-lg bg-dark-700/50 text-dark-300 hover:bg-dark-700 text-sm font-medium transition-all cursor-pointer"
             >
               Cancelar
             </button>
@@ -194,8 +204,8 @@ export default function EndpointCard({ endpoint, appUrl }: EndpointCardProps) {
             <label className="text-xs text-dark-400 uppercase tracking-wide font-medium">URL</label>
             <CopyButton text={webhookUrl} />
           </div>
-          <div className="mt-1.5 p-3 bg-dark-900/50 rounded-lg border border-white/5 overflow-x-auto">
-            <code className="text-sm text-accent-light whitespace-nowrap">{webhookUrl}</code>
+          <div className="mt-1.5 p-3 bg-dark-900/50 rounded-lg border border-white/5 overflow-x-auto" style={{ WebkitOverflowScrolling: 'touch' }}>
+            <code className="text-sm text-accent-light whitespace-nowrap inline-block min-w-max">{webhookUrl}</code>
           </div>
           {endpoint.type === 'sale_approved' && (
             <p className="text-xs text-dark-400 mt-2">
