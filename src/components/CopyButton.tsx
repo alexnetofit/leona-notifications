@@ -23,10 +23,10 @@ export default function CopyButton({ text, className = '' }: CopyButtonProps) {
   return (
     <button
       onClick={handleCopy}
-      className={`inline-flex items-center gap-2 px-3 py-1.5 text-sm rounded-md transition-all duration-200 ${
+      className={`inline-flex items-center gap-2 px-3 py-1.5 text-sm font-medium rounded-lg transition-all duration-300 ${
         copied
-          ? 'bg-accent/20 text-accent'
-          : 'bg-dark-700 hover:bg-dark-600 text-dark-300 hover:text-dark-100'
+          ? 'bg-accent/20 text-accent-light shadow-glow'
+          : 'bg-dark-800/50 hover:bg-dark-700/50 text-dark-300 hover:text-dark-50 border border-white/5 hover:border-accent/30'
       } ${className}`}
     >
       {copied ? (

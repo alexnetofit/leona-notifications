@@ -9,24 +9,39 @@ import type { EndpointType } from '@/types';
 
 export const dynamic = 'force-dynamic';
 
-const endpointTypes: { value: EndpointType; label: string; description: string; icon: string }[] = [
+const endpointTypes: { value: EndpointType; label: string; description: string; icon: React.ReactNode; gradient: string }[] = [
   {
     value: 'disconnected',
     label: 'Desconexão',
     description: 'Alerta quando uma instância desconectar',
-    icon: '🔌',
+    icon: (
+      <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18.364 5.636a9 9 0 010 12.728m0 0l-2.829-2.829m2.829 2.829L21 21M15.536 8.464a5 5 0 010 7.072m0 0l-2.829-2.829m-4.243 2.829a4.978 4.978 0 01-1.414-2.83m-1.414 5.658a9 9 0 01-2.167-9.238m7.824 2.167a1 1 0 111.414 1.414m-1.414-1.414L3 3m8.293 8.293l1.414 1.414" />
+      </svg>
+    ),
+    gradient: 'from-red-500/20 to-red-600/20',
   },
   {
     value: 'sale_approved',
     label: 'Venda Aprovada',
     description: 'Notifica quando uma venda for aprovada',
-    icon: '💰',
+    icon: (
+      <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+      </svg>
+    ),
+    gradient: 'from-green-500/20 to-emerald-600/20',
   },
   {
     value: 'generic',
     label: 'Genérico',
     description: 'Notificação personalizada para qualquer evento',
-    icon: '📨',
+    icon: (
+      <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+      </svg>
+    ),
+    gradient: 'from-accent/20 to-accent-bright/20',
   },
 ];
 
@@ -91,22 +106,34 @@ export default function NewEndpointPage() {
     }
   };
 
+  const getIconColor = (typeValue: EndpointType) => {
+    switch (typeValue) {
+      case 'disconnected': return 'text-red-400';
+      case 'sale_approved': return 'text-green-400';
+      default: return 'text-accent-light';
+    }
+  };
+
   return (
-    <div className="min-h-screen bg-dark-900">
+    <div className="min-h-screen bg-cosmic relative">
+      {/* Glowing orbs */}
+      <div className="glow-orb glow-orb-1" />
+      <div className="glow-orb glow-orb-2" />
+      
       <Header />
       
-      <main className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <main className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-8 relative z-10">
         <div className="mb-8">
-          <h1 className="text-2xl font-bold text-dark-50">Novo Endpoint</h1>
-          <p className="text-dark-400 mt-1">
+          <h1 className="text-2xl sm:text-3xl font-bold text-dark-50">Novo Endpoint</h1>
+          <p className="text-dark-300 mt-1">
             Configure um novo webhook para receber notificações
           </p>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-8">
+        <form onSubmit={handleSubmit} className="space-y-6">
           {/* Name */}
           <div className="card">
-            <label htmlFor="name" className="block text-sm font-medium text-dark-200 mb-2">
+            <label htmlFor="name" className="block text-sm font-medium text-dark-100 mb-2">
               Nome do Endpoint
             </label>
             <input
@@ -118,24 +145,24 @@ export default function NewEndpointPage() {
               required
               className="input"
             />
-            <p className="text-xs text-dark-500 mt-2">
+            <p className="text-xs text-dark-400 mt-2">
               Um nome para identificar este endpoint
             </p>
           </div>
 
           {/* Type Selection */}
           <div className="card">
-            <label className="block text-sm font-medium text-dark-200 mb-4">
+            <label className="block text-sm font-medium text-dark-100 mb-4">
               Tipo de Notificação
             </label>
             <div className="space-y-3">
               {endpointTypes.map((option) => (
                 <label
                   key={option.value}
-                  className={`flex items-start gap-4 p-4 rounded-lg border cursor-pointer transition-all ${
+                  className={`flex items-start gap-4 p-4 rounded-xl border cursor-pointer transition-all duration-300 ${
                     type === option.value
-                      ? 'border-accent bg-accent/5'
-                      : 'border-dark-700 hover:border-dark-600'
+                      ? 'border-accent/50 bg-accent/5 shadow-glow'
+                      : 'border-white/10 hover:border-white/20 bg-dark-900/30'
                   }`}
                 >
                   <input
@@ -146,15 +173,19 @@ export default function NewEndpointPage() {
                     onChange={(e) => setType(e.target.value as EndpointType)}
                     className="sr-only"
                   />
-                  <span className="text-2xl">{option.icon}</span>
+                  <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${option.gradient} flex items-center justify-center ${getIconColor(option.value)} shrink-0`}>
+                    {option.icon}
+                  </div>
                   <div className="flex-1">
-                    <span className="block font-medium text-dark-100">{option.label}</span>
-                    <span className="block text-sm text-dark-400 mt-0.5">{option.description}</span>
+                    <span className="block font-semibold text-dark-50">{option.label}</span>
+                    <span className="block text-sm text-dark-300 mt-0.5">{option.description}</span>
                   </div>
                   {type === option.value && (
-                    <svg className="w-5 h-5 text-accent mt-0.5" fill="currentColor" viewBox="0 0 20 20">
-                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                    </svg>
+                    <div className="w-6 h-6 rounded-full bg-accent flex items-center justify-center shrink-0">
+                      <svg className="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                      </svg>
+                    </div>
                   )}
                 </label>
               ))}
@@ -165,7 +196,7 @@ export default function NewEndpointPage() {
           {type === 'sale_approved' && (
             <div className="card space-y-4">
               <div>
-                <label htmlFor="saleTitle" className="block text-sm font-medium text-dark-200 mb-2">
+                <label htmlFor="saleTitle" className="block text-sm font-medium text-dark-100 mb-2">
                   Título da Notificação
                 </label>
                 <input
@@ -176,7 +207,7 @@ export default function NewEndpointPage() {
                   placeholder="🤑 Venda Aprovada!"
                   className="input"
                 />
-                <p className="text-xs text-dark-500 mt-2">
+                <p className="text-xs text-dark-400 mt-2">
                   O corpo será: &quot;Valor: [valor da venda]&quot;
                 </p>
               </div>
@@ -187,7 +218,7 @@ export default function NewEndpointPage() {
           {type === 'generic' && (
             <div className="card space-y-4">
               <div>
-                <label htmlFor="genericTitle" className="block text-sm font-medium text-dark-200 mb-2">
+                <label htmlFor="genericTitle" className="block text-sm font-medium text-dark-100 mb-2">
                   Título da Notificação
                 </label>
                 <input
@@ -201,7 +232,7 @@ export default function NewEndpointPage() {
                 />
               </div>
               <div>
-                <label htmlFor="genericBody" className="block text-sm font-medium text-dark-200 mb-2">
+                <label htmlFor="genericBody" className="block text-sm font-medium text-dark-100 mb-2">
                   Corpo da Notificação
                 </label>
                 <textarea
@@ -214,27 +245,35 @@ export default function NewEndpointPage() {
                   className="input resize-none"
                 />
               </div>
-              <p className="text-xs text-dark-500">
+              <p className="text-xs text-dark-400">
                 Estes textos serão exibidos sempre que o webhook for acionado.
               </p>
             </div>
           )}
 
           {/* Preview */}
-          <div className="card bg-dark-850">
-            <h3 className="text-sm font-medium text-dark-300 mb-3">Preview da Notificação</h3>
-            <div className="bg-dark-800 rounded-lg p-4 border border-dark-700">
+          <div className="card border-accent/20">
+            <h3 className="text-sm font-medium text-dark-300 mb-3 flex items-center gap-2">
+              <svg className="w-4 h-4 text-accent-light" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+              </svg>
+              Preview da Notificação
+            </h3>
+            <div className="bg-dark-900/50 rounded-xl p-4 border border-white/5">
               <div className="flex items-start gap-3">
-                <div className="w-10 h-10 rounded-lg bg-dark-700 flex items-center justify-center flex-shrink-0">
-                  <span className="text-lg">🔔</span>
+                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-accent/20 to-accent-bright/20 flex items-center justify-center flex-shrink-0">
+                  <svg className="w-5 h-5 text-accent-light" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+                  </svg>
                 </div>
                 <div>
-                  <p className="font-medium text-dark-100">
+                  <p className="font-medium text-dark-50">
                     {type === 'disconnected' && '🚨 Atenção! [Nome] desconectou!'}
                     {type === 'sale_approved' && (saleTitle || '🤑 Venda Aprovada!')}
                     {type === 'generic' && (genericTitle || 'Título da notificação')}
                   </p>
-                  <p className="text-sm text-dark-400 mt-0.5">
+                  <p className="text-sm text-dark-300 mt-0.5">
                     {type === 'disconnected' && 'O número [número] precisa de atenção'}
                     {type === 'sale_approved' && 'Valor: R$ XXX,XX'}
                     {type === 'generic' && (genericBody || 'Corpo da notificação')}
@@ -246,7 +285,10 @@ export default function NewEndpointPage() {
 
           {/* Error */}
           {error && (
-            <div className="p-4 rounded-lg bg-red-900/20 text-red-400 border border-red-900/50 text-sm">
+            <div className="p-4 rounded-lg bg-red-500/10 border border-red-500/20 text-sm flex items-center gap-2 text-red-400">
+              <svg className="w-5 h-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
               {error}
             </div>
           )}
@@ -256,9 +298,24 @@ export default function NewEndpointPage() {
             <button
               type="submit"
               disabled={loading || !name || (type === 'generic' && (!genericTitle || !genericBody))}
-              className="btn-primary flex-1"
+              className="btn-primary flex-1 flex items-center justify-center gap-2"
             >
-              {loading ? 'Criando...' : 'Criar Endpoint'}
+              {loading ? (
+                <>
+                  <svg className="animate-spin h-5 w-5" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                  </svg>
+                  Criando...
+                </>
+              ) : (
+                <>
+                  <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                  </svg>
+                  Criar Endpoint
+                </>
+              )}
             </button>
             <button
               type="button"

@@ -4,8 +4,8 @@
   "description": "Receba notificações em tempo real via webhooks",
   "start_url": "/dashboard",
   "display": "standalone",
-  "background_color": "#202123",
-  "theme_color": "#10a37f",
+  "background_color": "#0f0a1a",
+  "theme_color": "#8b5cf6",
   "orientation": "portrait-primary",
   "icons": [
     {

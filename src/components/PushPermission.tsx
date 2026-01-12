@@ -69,25 +69,32 @@ export default function PushPermission({ onSubscribed }: PushPermissionProps) {
 
   if (permission === 'unsupported') {
     return (
-      <div className="card bg-yellow-900/20 border-yellow-800/50">
-        <p className="text-sm text-yellow-200">
-          ⚠️ Seu navegador não suporta notificações push. Use Chrome, Firefox ou Edge.
-        </p>
+      <div className="card border-amber-500/20 bg-amber-500/5">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-xl bg-amber-500/20 flex items-center justify-center text-amber-400 shrink-0">
+            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+            </svg>
+          </div>
+          <p className="text-sm text-amber-200">
+            Seu navegador não suporta notificações push. Use Chrome, Firefox ou Edge.
+          </p>
+        </div>
       </div>
     );
   }
 
   if (permission === 'granted') {
     return (
-      <div className="card bg-accent/10 border-accent/30">
+      <div className="card border-green-500/20 bg-green-500/5">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-full bg-accent/20 flex items-center justify-center">
-            <svg className="w-5 h-5 text-accent" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+          <div className="w-10 h-10 rounded-xl bg-green-500/20 flex items-center justify-center text-green-400">
+            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
           </div>
           <div>
-            <p className="text-sm font-medium text-accent">Notificações ativadas</p>
+            <p className="text-sm font-medium text-green-300">Notificações ativadas</p>
             <p className="text-xs text-dark-400">Este dispositivo receberá notificações push.</p>
           </div>
         </div>
@@ -96,27 +103,44 @@ export default function PushPermission({ onSubscribed }: PushPermissionProps) {
   }
 
   return (
-    <div className="card">
+    <div className="card glow-border">
       <div className="flex items-start gap-4">
-        <div className="w-12 h-12 rounded-full bg-accent/10 flex items-center justify-center flex-shrink-0">
-          <svg className="w-6 h-6 text-accent" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-accent/20 to-accent-bright/20 flex items-center justify-center flex-shrink-0">
+          <svg className="w-6 h-6 text-accent-light" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
           </svg>
         </div>
         <div className="flex-1">
-          <h3 className="font-medium text-dark-100">Ativar Notificações Push</h3>
-          <p className="text-sm text-dark-400 mt-1">
+          <h3 className="font-semibold text-dark-50">Ativar Notificações Push</h3>
+          <p className="text-sm text-dark-300 mt-1">
             Receba alertas em tempo real quando seus webhooks forem acionados.
           </p>
           {error && (
-            <p className="text-sm text-red-400 mt-2">{error}</p>
+            <div className="mt-3 p-3 rounded-lg bg-red-500/10 border border-red-500/20">
+              <p className="text-sm text-red-400">{error}</p>
+            </div>
           )}
           <button
             onClick={subscribeToPush}
             disabled={loading}
-            className="btn-primary mt-4"
+            className="btn-primary mt-4 flex items-center gap-2"
           >
-            {loading ? 'Ativando...' : 'Ativar Notificações'}
+            {loading ? (
+              <>
+                <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                </svg>
+                Ativando...
+              </>
+            ) : (
+              <>
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+                </svg>
+                Ativar Notificações
+              </>
+            )}
           </button>
         </div>
       </div>

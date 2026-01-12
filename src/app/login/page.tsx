@@ -3,6 +3,7 @@
 import { useState, useMemo } from 'react';
 import Image from 'next/image';
 import { createClient } from '@/lib/supabase/client';
+import InstallPrompt from '@/components/InstallPrompt';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
@@ -43,29 +44,40 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center px-4 bg-gradient-to-b from-dark-900 to-dark-950">
-      <div className="w-full max-w-md">
+    <div className="min-h-screen flex flex-col items-center justify-center px-4 bg-cosmic particles-bg relative overflow-hidden">
+      {/* Glowing orbs */}
+      <div className="glow-orb glow-orb-1" />
+      <div className="glow-orb glow-orb-2" />
+      
+      {/* Wave lines effect */}
+      <div className="wave-lines" />
+
+      <div className="w-full max-w-md relative z-10">
         {/* Logo */}
         <div className="text-center mb-10">
-          <div className="w-20 h-20 mx-auto mb-6 relative">
+          <div className="w-24 h-24 mx-auto mb-6 relative animate-float">
+            <div className="absolute inset-0 rounded-full bg-accent/20 blur-xl" />
             <Image
               src="/image/logo.png"
               alt="Leona"
               fill
-              className="object-contain"
+              className="object-contain relative z-10 drop-shadow-[0_0_15px_rgba(168,85,247,0.5)]"
               priority
             />
           </div>
-          <h1 className="text-3xl font-bold text-dark-50">
-            Leona <span className="text-gradient">Notifications</span>
+          <h1 className="text-4xl font-bold text-dark-50 mb-2">
+            Leona
           </h1>
-          <p className="text-dark-400 mt-2">
+          <p className="text-xl text-gradient-glow font-medium">
+            Notifications
+          </p>
+          <p className="text-dark-300 mt-3 text-sm">
             Receba notificações em tempo real via webhooks
           </p>
         </div>
 
         {/* Login Card */}
-        <div className="card">
+        <div className="card glow-border">
           <form onSubmit={handleLogin} className="space-y-6">
             <div>
               <label htmlFor="email" className="block text-sm font-medium text-dark-200 mb-2">
@@ -85,13 +97,24 @@ export default function LoginPage() {
 
             {message && (
               <div
-                className={`p-4 rounded-lg text-sm ${
+                className={`p-4 rounded-lg text-sm backdrop-blur-sm ${
                   message.type === 'success'
-                    ? 'bg-accent/10 text-accent border border-accent/30'
+                    ? 'bg-accent/10 text-accent-light border border-accent/30'
                     : 'bg-red-900/20 text-red-400 border border-red-900/50'
                 }`}
               >
-                {message.text}
+                <div className="flex items-center gap-2">
+                  {message.type === 'success' ? (
+                    <svg className="w-5 h-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                  ) : (
+                    <svg className="w-5 h-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                  )}
+                  {message.text}
+                </div>
               </div>
             )}
 
@@ -121,25 +144,33 @@ export default function LoginPage() {
                   Enviando...
                 </span>
               ) : (
-                'Entrar com Magic Link'
+                <span className="flex items-center justify-center gap-2">
+                  <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" />
+                  </svg>
+                  Entrar com Magic Link
+                </span>
               )}
             </button>
           </form>
 
-          <div className="mt-6 pt-6 border-t border-dark-700 text-center">
-            <p className="text-sm text-dark-500">
+          <div className="mt-6 pt-6 border-t border-white/10 text-center">
+            <p className="text-sm text-dark-400">
               Enviaremos um link de acesso para seu email.
               <br />
-              Sem senha, sem complicação.
+              <span className="text-dark-300">Sem senha, sem complicação.</span>
             </p>
           </div>
         </div>
 
         {/* Footer */}
-        <p className="text-center text-dark-600 text-xs mt-8">
+        <p className="text-center text-dark-500 text-xs mt-8">
           © {new Date().getFullYear()} Leona Notifications
         </p>
       </div>
+
+      {/* Install Prompt */}
+      <InstallPrompt />
     </div>
   );
 }

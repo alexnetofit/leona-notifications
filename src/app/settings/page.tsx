@@ -20,13 +20,17 @@ export default async function SettingsPage() {
     .order('created_at', { ascending: false });
 
   return (
-    <div className="min-h-screen bg-dark-900">
+    <div className="min-h-screen bg-cosmic relative">
+      {/* Glowing orbs */}
+      <div className="glow-orb glow-orb-1" />
+      <div className="glow-orb glow-orb-2" />
+      
       <Header />
       
-      <main className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <main className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8 relative z-10">
         <div className="mb-8">
-          <h1 className="text-2xl font-bold text-dark-50">Configurações</h1>
-          <p className="text-dark-400 mt-1">
+          <h1 className="text-2xl sm:text-3xl font-bold text-dark-50">Configurações</h1>
+          <p className="text-dark-300 mt-1">
             Gerencie sua conta e dispositivos
           </p>
         </div>
