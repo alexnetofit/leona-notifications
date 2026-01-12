@@ -1,9 +1,7 @@
 'use client';
 
-import dynamic from 'next/dynamic';
 import { ReactNode } from 'react';
-
-const RequirePWA = dynamic(() => import('./RequirePWA'), { ssr: false });
+import RequirePWA from './RequirePWA';
 
 interface RequirePWAWrapperProps {
   children: ReactNode;
