@@ -1,8 +1,11 @@
 'use client';
 
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { Endpoint } from '@/types';
 import { formatEndpointType } from '@/lib/utils';
+import { createClient } from '@/lib/supabase/client';
 import CopyButton from './CopyButton';
 
 interface EndpointCardProps {
@@ -11,8 +14,13 @@ interface EndpointCardProps {
 }
 
 export default function EndpointCard({ endpoint, appUrl }: EndpointCardProps) {
+  const router = useRouter();
+  const supabase = createClient();
+  
   const [testing, setTesting] = useState(false);
   const [testResult, setTestResult] = useState<{ success: boolean; message: string } | null>(null);
+  const [deleting, setDeleting] = useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
   // Build webhook URL based on type
   let webhookUrl = `${appUrl}/api/webhook/${endpoint.id}?token=${endpoint.secret}`;
@@ -48,11 +56,35 @@ export default function EndpointCard({ endpoint, appUrl }: EndpointCardProps) {
       console.error('Test error:', error);
       setTestResult({
         success: false,
-        message: 'Erro ao testar endpoint',
+        message: 'Erro ao testar',
       });
       setTimeout(() => setTestResult(null), 3000);
     } finally {
       setTesting(false);
+    }
+  };
+
+  const handleDelete = async () => {
+    setDeleting(true);
+    try {
+      const { error } = await supabase
+        .from('endpoints')
+        .delete()
+        .eq('id', endpoint.id);
+
+      if (error) throw error;
+      
+      router.refresh();
+    } catch (error) {
+      console.error('Delete error:', error);
+      setTestResult({
+        success: false,
+        message: 'Erro ao excluir',
+      });
+      setTimeout(() => setTestResult(null), 3000);
+    } finally {
+      setDeleting(false);
+      setShowDeleteConfirm(false);
     }
   };
 
@@ -106,12 +138,58 @@ export default function EndpointCard({ endpoint, appUrl }: EndpointCardProps) {
             <span className="text-sm text-dark-400">{formatEndpointType(endpoint.type)}</span>
           </div>
         </div>
-        <CopyButton text={webhookUrl} />
+        <div className="flex items-center gap-2">
+          <Link
+            href={`/endpoints/${endpoint.id}/edit`}
+            className="p-2 rounded-lg text-dark-400 hover:text-accent-light hover:bg-accent/10 transition-all"
+            title="Editar"
+          >
+            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+            </svg>
+          </Link>
+          <button
+            onClick={() => setShowDeleteConfirm(true)}
+            className="p-2 rounded-lg text-dark-400 hover:text-red-400 hover:bg-red-500/10 transition-all"
+            title="Excluir"
+          >
+            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+            </svg>
+          </button>
+        </div>
       </div>
+
+      {/* Delete Confirmation */}
+      {showDeleteConfirm && (
+        <div className="mb-4 p-4 rounded-lg bg-red-500/10 border border-red-500/20">
+          <p className="text-sm text-red-300 mb-3">
+            Tem certeza que deseja excluir esta notificação?
+          </p>
+          <div className="flex gap-2">
+            <button
+              onClick={handleDelete}
+              disabled={deleting}
+              className="flex-1 px-3 py-2 rounded-lg bg-red-500/20 text-red-400 hover:bg-red-500/30 text-sm font-medium transition-all disabled:opacity-50"
+            >
+              {deleting ? 'Excluindo...' : 'Sim, excluir'}
+            </button>
+            <button
+              onClick={() => setShowDeleteConfirm(false)}
+              className="flex-1 px-3 py-2 rounded-lg bg-dark-700/50 text-dark-300 hover:bg-dark-700 text-sm font-medium transition-all"
+            >
+              Cancelar
+            </button>
+          </div>
+        </div>
+      )}
 
       <div className="space-y-3">
         <div>
-          <label className="text-xs text-dark-400 uppercase tracking-wide font-medium">URL do Webhook</label>
+          <div className="flex items-center justify-between">
+            <label className="text-xs text-dark-400 uppercase tracking-wide font-medium">URL do Webhook</label>
+            <CopyButton text={webhookUrl} />
+          </div>
           <div className="mt-1.5 p-3 bg-dark-900/50 rounded-lg border border-white/5">
             <code className="text-sm text-accent-light break-all">{webhookUrl}</code>
           </div>
