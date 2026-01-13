@@ -127,7 +127,7 @@ export default function EndpointCard({ endpoint, appUrl }: EndpointCardProps) {
   const typeStyles = getTypeStyles();
 
   return (
-    <div className="card card-hover glow-border group">
+    <div className="card card-hover glow-border group overflow-hidden">
       <div className="flex items-start justify-between mb-4">
         <div className="flex items-start gap-3">
           <div className={`w-10 h-10 rounded-xl bg-gradient-to-br ${typeStyles.iconBg} flex items-center justify-center ${typeStyles.iconColor} group-hover:shadow-glow transition-shadow`}>
@@ -204,9 +204,17 @@ export default function EndpointCard({ endpoint, appUrl }: EndpointCardProps) {
             <label className="text-xs text-dark-400 uppercase tracking-wide font-medium">URL</label>
             <CopyButton text={webhookUrl} />
           </div>
-          <div className="mt-1.5 bg-dark-900/50 rounded-lg border border-white/5">
-            <div className="p-3 overflow-x-auto max-w-full" style={{ WebkitOverflowScrolling: 'touch' }}>
-              <pre className="text-sm text-accent-light whitespace-pre overflow-x-auto m-0 font-mono">{webhookUrl}</pre>
+          <div className="mt-1.5 bg-dark-900/50 rounded-lg border border-white/5 overflow-hidden">
+            <div 
+              className="p-3 url-scroll" 
+              style={{ 
+                overflowX: 'auto', 
+                overflowY: 'hidden',
+                WebkitOverflowScrolling: 'touch',
+                maxWidth: '100%'
+              }}
+            >
+              <code className="text-sm text-accent-light whitespace-nowrap inline-block font-mono">{webhookUrl}</code>
             </div>
           </div>
           {endpoint.type === 'sale_approved' && (
