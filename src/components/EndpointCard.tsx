@@ -204,17 +204,9 @@ export default function EndpointCard({ endpoint, appUrl }: EndpointCardProps) {
             <label className="text-xs text-dark-400 uppercase tracking-wide font-medium">URL</label>
             <CopyButton text={webhookUrl} />
           </div>
-          <div className="mt-1.5 bg-dark-900/50 rounded-lg border border-white/5 overflow-hidden">
-            <div 
-              className="p-3 url-scroll" 
-              style={{ 
-                overflowX: 'auto', 
-                overflowY: 'hidden',
-                WebkitOverflowScrolling: 'touch',
-                maxWidth: '100%'
-              }}
-            >
-              <code className="text-sm text-accent-light whitespace-nowrap inline-block font-mono">{webhookUrl}</code>
+          <div className="mt-1.5 bg-dark-900/50 rounded-lg border border-white/5 relative" style={{ contain: 'inline-size' }}>
+            <div className="p-3 overflow-x-auto" style={{ WebkitOverflowScrolling: 'touch' }}>
+              <code className="text-sm text-accent-light whitespace-nowrap block font-mono select-all">{webhookUrl}</code>
             </div>
           </div>
           {endpoint.type === 'sale_approved' && (

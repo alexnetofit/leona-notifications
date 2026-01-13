@@ -59,7 +59,7 @@ export default async function DashboardPage() {
 
         {/* Endpoints Grid */}
         {endpoints && endpoints.length > 0 ? (
-          <div className="grid gap-6 md:grid-cols-2">
+          <div className="grid gap-6 grid-cols-1 md:grid-cols-2">
             {endpoints.map((endpoint: Endpoint) => (
               <EndpointCard
                 key={endpoint.id}
