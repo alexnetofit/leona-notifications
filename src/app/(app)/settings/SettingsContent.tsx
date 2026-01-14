@@ -4,25 +4,33 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
 import type { PushSubscription } from '@/types';
-import type { User } from '@supabase/supabase-js';
 
 interface SettingsContentProps {
-  user: User;
+  user: { id: string; email?: string };
   subscriptions: PushSubscription[];
+  onMutate?: () => void;
 }
 
-export default function SettingsContent({ user, subscriptions }: SettingsContentProps) {
+export default function SettingsContent({ user, subscriptions, onMutate }: SettingsContentProps) {
   const router = useRouter();
   const supabase = createClient();
   const [loading, setLoading] = useState<number | null>(null);
   const [verifying, setVerifying] = useState(false);
   const [verifyResult, setVerifyResult] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
 
+  const refreshData = () => {
+    if (onMutate) {
+      onMutate();
+    } else {
+      router.refresh();
+    }
+  };
+
   const handleRemoveSubscription = async (id: number) => {
     setLoading(id);
     try {
       await supabase.from('push_subscriptions').delete().eq('id', id);
-      router.refresh();
+      refreshData();
     } catch (err) {
       console.error('Error removing subscription:', err);
     } finally {
@@ -40,7 +48,7 @@ export default function SettingsContent({ user, subscriptions }: SettingsContent
       if (data.success) {
         setVerifyResult({ message: data.message, type: 'success' });
         if (data.removed > 0) {
-          router.refresh();
+          refreshData();
         }
       } else {
         setVerifyResult({ message: data.error || 'Erro ao verificar', type: 'error' });

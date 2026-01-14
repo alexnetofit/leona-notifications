@@ -1,17 +1,30 @@
-import { createClient } from '@/lib/supabase/server';
+'use client';
+
+import { useSubscriptions } from '@/hooks/useAppData';
 import SettingsContent from './SettingsContent';
-import type { PushSubscription } from '@/types';
 
-export default async function SettingsPage() {
-  const supabase = await createClient();
-  
-  const { data: { user } } = await supabase.auth.getUser();
+// Skeleton loader
+function SettingsSkeleton() {
+  return (
+    <div className="space-y-6">
+      {[1, 2, 3].map((i) => (
+        <div key={i} className="card animate-pulse">
+          <div className="flex items-center gap-3 mb-4">
+            <div className="w-10 h-10 rounded-xl bg-dark-700/50" />
+            <div className="w-40 h-5 rounded bg-dark-700/50" />
+          </div>
+          <div className="space-y-3">
+            <div className="w-full h-4 rounded bg-dark-700/50" />
+            <div className="w-3/4 h-4 rounded bg-dark-700/50" />
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
 
-  const { data: subscriptions } = await supabase
-    .from('push_subscriptions')
-    .select('*')
-    .eq('user_id', user!.id)
-    .order('created_at', { ascending: false });
+export default function SettingsPage() {
+  const { subscriptions, user, isLoading, mutate } = useSubscriptions();
 
   return (
     <main className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8 pb-24 sm:pb-8 relative z-10">
@@ -22,10 +35,15 @@ export default async function SettingsPage() {
         </p>
       </div>
 
-      <SettingsContent 
-        user={user!}
-        subscriptions={(subscriptions as PushSubscription[]) || []}
-      />
+      {isLoading || !user ? (
+        <SettingsSkeleton />
+      ) : (
+        <SettingsContent 
+          user={user}
+          subscriptions={subscriptions}
+          onMutate={mutate}
+        />
+      )}
     </main>
   );
 }

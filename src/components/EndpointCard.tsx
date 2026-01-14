@@ -11,9 +11,10 @@ import CopyButton from './CopyButton';
 interface EndpointCardProps {
   endpoint: Endpoint;
   appUrl: string;
+  onDelete?: () => void;
 }
 
-export default function EndpointCard({ endpoint, appUrl }: EndpointCardProps) {
+export default function EndpointCard({ endpoint, appUrl, onDelete }: EndpointCardProps) {
   const router = useRouter();
   const supabase = createClient();
   
@@ -74,7 +75,12 @@ export default function EndpointCard({ endpoint, appUrl }: EndpointCardProps) {
 
       if (error) throw error;
       
-      router.refresh();
+      // Call onDelete callback if provided (for SWR revalidation)
+      if (onDelete) {
+        onDelete();
+      } else {
+        router.refresh();
+      }
     } catch (error) {
       console.error('Delete error:', error);
       setTestResult({

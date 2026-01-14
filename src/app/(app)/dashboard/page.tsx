@@ -1,27 +1,39 @@
+'use client';
+
 import Link from 'next/link';
-import { createClient } from '@/lib/supabase/server';
 import EndpointCard from '@/components/EndpointCard';
 import PushPermission from '@/components/PushPermission';
-import type { Endpoint } from '@/types';
+import { useEndpoints } from '@/hooks/useAppData';
 
-export default async function DashboardPage() {
-  const supabase = await createClient();
-  
-  const { data: { user } } = await supabase.auth.getUser();
+const APP_URL = process.env.NEXT_PUBLIC_APP_URL || 'https://notifications.leonaflow.com';
 
-  const { data: endpoints } = await supabase
-    .from('endpoints')
-    .select('*')
-    .eq('user_id', user!.id)
-    .order('created_at', { ascending: false });
+// Skeleton loader for cards
+function CardSkeleton() {
+  return (
+    <div className="card animate-pulse">
+      <div className="flex items-start gap-3 mb-4">
+        <div className="w-10 h-10 rounded-xl bg-dark-700/50" />
+        <div>
+          <div className="w-32 h-5 rounded bg-dark-700/50 mb-2" />
+          <div className="w-24 h-4 rounded bg-dark-700/50" />
+        </div>
+      </div>
+      <div className="space-y-3">
+        <div className="w-full h-16 rounded-lg bg-dark-700/50" />
+        <div className="w-full h-10 rounded-lg bg-dark-700/50" />
+      </div>
+    </div>
+  );
+}
 
-  const appUrl = process.env.APP_URL || 'https://notifications.leonaflow.com';
+export default function DashboardPage() {
+  const { endpoints, isLoading, mutate } = useEndpoints();
 
   return (
     <main className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 pb-24 sm:pb-8 relative z-10">
       {/* Push Permission Banner */}
       <section className="mb-8">
-        <PushPermission />
+        <PushPermission onSubscribed={() => mutate()} />
       </section>
 
       {/* Header Section */}
@@ -45,13 +57,19 @@ export default async function DashboardPage() {
       </div>
 
       {/* Endpoints Grid */}
-      {endpoints && endpoints.length > 0 ? (
+      {isLoading ? (
         <div className="grid gap-6 grid-cols-1 md:grid-cols-2">
-          {endpoints.map((endpoint: Endpoint) => (
+          <CardSkeleton />
+          <CardSkeleton />
+        </div>
+      ) : endpoints.length > 0 ? (
+        <div className="grid gap-6 grid-cols-1 md:grid-cols-2">
+          {endpoints.map((endpoint) => (
             <EndpointCard
               key={endpoint.id}
               endpoint={endpoint}
-              appUrl={appUrl}
+              appUrl={APP_URL}
+              onDelete={() => mutate()}
             />
           ))}
         </div>
