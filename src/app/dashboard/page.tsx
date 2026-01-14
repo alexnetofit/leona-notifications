@@ -21,7 +21,7 @@ export default async function DashboardPage() {
     .eq('user_id', user.id)
     .order('created_at', { ascending: false });
 
-  const appUrl = process.env.APP_URL || 'https://leona.vercel.app';
+  const appUrl = process.env.APP_URL || 'https://notifications.leonaflow.com';
 
   return (
     <div className="min-h-screen bg-cosmic relative">

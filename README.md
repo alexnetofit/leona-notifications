@@ -163,7 +163,7 @@ https://seu-dominio.vercel.app/api/webhook/{endpoint_id}?token={secret}
 #### Desconexão
 
 ```bash
-curl -X POST "https://leona.vercel.app/api/webhook/SEU_ENDPOINT_ID?token=SEU_SECRET" \
+curl -X POST "https://notifications.leonaflow.com/api/webhook/SEU_ENDPOINT_ID?token=SEU_SECRET" \
   -H "Content-Type: application/json" \
   -d '{
     "event": "disconnected",
@@ -179,7 +179,7 @@ curl -X POST "https://leona.vercel.app/api/webhook/SEU_ENDPOINT_ID?token=SEU_SEC
 #### Venda Aprovada
 
 ```bash
-curl "https://leona.vercel.app/api/webhook/SEU_ENDPOINT_ID?token=SEU_SECRET&valor=R$%20197,00"
+curl "https://notifications.leonaflow.com/api/webhook/SEU_ENDPOINT_ID?token=SEU_SECRET&valor=R$%20197,00"
 ```
 
 **Notificação gerada:**
@@ -189,7 +189,7 @@ curl "https://leona.vercel.app/api/webhook/SEU_ENDPOINT_ID?token=SEU_SECRET&valo
 #### Genérico
 
 ```bash
-curl -X POST "https://leona.vercel.app/api/webhook/SEU_ENDPOINT_ID?token=SEU_SECRET"
+curl -X POST "https://notifications.leonaflow.com/api/webhook/SEU_ENDPOINT_ID?token=SEU_SECRET"
 ```
 
 **Notificação gerada:**

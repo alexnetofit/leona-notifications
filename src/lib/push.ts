@@ -4,7 +4,7 @@ import type { NotificationPayload } from '@/types';
 // Configure web-push with VAPID keys
 if (process.env.VAPID_PRIVATE_KEY && process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY) {
   webpush.setVapidDetails(
-    `mailto:admin@${process.env.APP_URL?.replace('https://', '') || 'leona.vercel.app'}`,
+    `mailto:admin@${process.env.APP_URL?.replace('https://', '') || 'notifications.leonaflow.com'}`,
     process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY,
     process.env.VAPID_PRIVATE_KEY
   );
