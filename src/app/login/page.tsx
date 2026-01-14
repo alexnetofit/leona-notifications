@@ -284,7 +284,7 @@ export default function LoginPage() {
             </form>
           ) : (
             // Step 2: OTP Code
-            <form onSubmit={handleVerifyOtp} className="space-y-6">
+            <form onSubmit={handleVerifyOtp} className="space-y-6 relative z-10">
               <div>
                 <div className="flex items-center justify-between mb-4">
                   <label className="block text-sm font-medium text-dark-200">
@@ -293,7 +293,7 @@ export default function LoginPage() {
                   <button
                     type="button"
                     onClick={handleBack}
-                    className="text-sm text-dark-400 hover:text-accent-light transition-colors"
+                    className="text-sm text-dark-400 hover:text-accent-light transition-colors relative z-20 cursor-pointer"
                   >
                     Trocar email
                   </button>
@@ -381,12 +381,12 @@ export default function LoginPage() {
                 )}
               </button>
 
-              <div className="text-center">
+              <div className="text-center relative z-20">
                 <button
                   type="button"
                   onClick={handleResend}
                   disabled={countdown > 0 || loading}
-                  className={`text-sm transition-colors ${
+                  className={`text-sm transition-colors cursor-pointer ${
                     countdown > 0
                       ? 'text-dark-500 cursor-not-allowed'
                       : 'text-accent-light hover:text-accent'
