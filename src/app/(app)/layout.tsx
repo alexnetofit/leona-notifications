@@ -1,6 +1,5 @@
 import { redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
-import Header from '@/components/Header';
 
 export default async function AppLayout({
   children,
@@ -19,8 +18,6 @@ export default async function AppLayout({
       {/* Glowing orbs */}
       <div className="glow-orb glow-orb-1" />
       <div className="glow-orb glow-orb-2" />
-      
-      <Header />
       
       {children}
     </div>
