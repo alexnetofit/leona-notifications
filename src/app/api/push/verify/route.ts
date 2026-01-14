@@ -47,11 +47,12 @@ export async function POST() {
     }
 
     const invalidIds: number[] = [];
+    const results: { id: number; status: string; error?: string }[] = [];
 
-    // Test each subscription with a silent/empty push
+    // Test each subscription with a real test notification
     for (const sub of subscriptions) {
       try {
-        // Send a minimal test notification
+        // Send a real test notification to verify
         await webpush.sendNotification(
           {
             endpoint: sub.endpoint,
@@ -60,29 +61,58 @@ export async function POST() {
               auth: sub.auth,
             },
           },
-          JSON.stringify({ type: 'verify' }), // Silent verification
+          JSON.stringify({ 
+            type: 'verify',
+            title: 'Verificação',
+            body: 'Teste de conectividade',
+            silent: true // Custom flag to suppress display in service worker
+          }),
           {
-            TTL: 0, // Don't store if device is offline
+            TTL: 60, // Give 60 seconds to deliver
+            urgency: 'high',
           }
         );
+        results.push({ id: sub.id, status: 'valid' });
       } catch (error: unknown) {
         const statusCode = (error as { statusCode?: number })?.statusCode;
-        console.log(`Subscription ${sub.id} error:`, statusCode, (error as Error)?.message);
+        const errorMessage = (error as Error)?.message || 'Unknown error';
         
-        // Any error means the subscription is likely invalid
-        // 410 Gone, 404 Not Found, 401 Unauthorized, etc.
-        if (statusCode && (statusCode === 410 || statusCode === 404 || statusCode === 401 || statusCode >= 400)) {
+        console.log(`Subscription ${sub.id} verification failed:`, {
+          statusCode,
+          message: errorMessage,
+          endpoint: sub.endpoint.substring(0, 50) + '...'
+        });
+        
+        results.push({ 
+          id: sub.id, 
+          status: 'invalid', 
+          error: `${statusCode}: ${errorMessage}` 
+        });
+        
+        // Mark as invalid for any error response
+        // 410 = Gone (unsubscribed)
+        // 404 = Not found
+        // 401 = Unauthorized
+        // 403 = Forbidden
+        // Any 4xx or 5xx = problem
+        if (statusCode) {
           invalidIds.push(sub.id);
         }
       }
     }
 
+    console.log('Verification results:', JSON.stringify(results, null, 2));
+
     // Remove invalid subscriptions
     if (invalidIds.length > 0) {
-      await supabase
+      const { error: deleteError } = await supabase
         .from('push_subscriptions')
         .delete()
         .in('id', invalidIds);
+      
+      if (deleteError) {
+        console.error('Error deleting invalid subscriptions:', deleteError);
+      }
     }
 
     return NextResponse.json({
@@ -92,6 +122,7 @@ export async function POST() {
         : 'Todos os dispositivos estão válidos',
       removed: invalidIds.length,
       total: subscriptions.length,
+      details: results, // Include details for debugging
     });
   } catch (error) {
     console.error('Verify error:', error);

@@ -30,6 +30,12 @@ self.addEventListener('push', (event) => {
     }
   }
 
+  // Ignore verification/silent pushes - don't show notification
+  if (data.type === 'verify' || data.silent === true) {
+    console.log('[SW] Verification push received, ignoring...');
+    return;
+  }
+
   const options = {
     body: data.body,
     icon: data.icon || '/image/notification_logo_1.png',
