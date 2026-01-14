@@ -1,11 +1,11 @@
 'use client';
 
-import { useState, useEffect, useMemo } from 'react';
-import { useRouter, useParams } from 'next/navigation';
+import { useState, useMemo } from 'react';
+import { useRouter } from 'next/navigation';
 import Image from 'next/image';
-import Header from '@/components/Header';
 import { createClient } from '@/lib/supabase/client';
-import type { EndpointType, Endpoint } from '@/types';
+import { generateEndpointId, generateSecret } from '@/lib/utils';
+import type { EndpointType } from '@/types';
 
 export const dynamic = 'force-dynamic';
 
@@ -45,63 +45,35 @@ const endpointTypes: { value: EndpointType; label: string; description: string; 
   },
 ];
 
-export default function EditEndpointPage() {
+export default function NewEndpointPage() {
   const router = useRouter();
-  const params = useParams();
-  const endpointId = params.id as string;
   const supabase = useMemo(() => createClient(), []);
-
-  const [loading, setLoading] = useState(true);
-  const [saving, setSaving] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [endpoint, setEndpoint] = useState<Endpoint | null>(null);
 
   const [name, setName] = useState('');
   const [type, setType] = useState<EndpointType>('disconnected');
-  const [saleTitle, setSaleTitle] = useState('');
+  const [saleTitle, setSaleTitle] = useState('🤑 Venda Aprovada!');
   const [genericTitle, setGenericTitle] = useState('');
   const [genericBody, setGenericBody] = useState('');
-
-  useEffect(() => {
-    async function loadEndpoint() {
-      try {
-        const { data, error } = await supabase
-          .from('endpoints')
-          .select('*')
-          .eq('id', endpointId)
-          .single();
-
-        if (error) throw error;
-        if (!data) throw new Error('Notificação não encontrada');
-
-        const ep = data as Endpoint;
-        setEndpoint(ep);
-        setName(ep.name);
-        setType(ep.type);
-
-        if (ep.type === 'sale_approved') {
-          setSaleTitle(ep.generic_title || '🤑 Venda Aprovada!');
-        } else if (ep.type === 'generic') {
-          setGenericTitle(ep.generic_title || '');
-          setGenericBody(ep.generic_body || '');
-        }
-      } catch (err) {
-        console.error('Error loading endpoint:', err);
-        setError('Erro ao carregar notificação.');
-      } finally {
-        setLoading(false);
-      }
-    }
-
-    loadEndpoint();
-  }, [endpointId, supabase]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setSaving(true);
+    setLoading(true);
     setError(null);
 
     try {
+      const { data: { user } } = await supabase.auth.getUser();
+      
+      if (!user) {
+        router.push('/login');
+        return;
+      }
+
+      const endpointId = generateEndpointId();
+      const secret = generateSecret();
+
+      // Determine title based on type
       let titleToSave = null;
       let bodyToSave = null;
 
@@ -112,25 +84,25 @@ export default function EditEndpointPage() {
         bodyToSave = genericBody;
       }
 
-      const { error: updateError } = await supabase
-        .from('endpoints')
-        .update({
-          name,
-          type,
-          generic_title: titleToSave,
-          generic_body: bodyToSave,
-        })
-        .eq('id', endpointId);
+      const { error: insertError } = await supabase.from('endpoints').insert({
+        id: endpointId,
+        user_id: user.id,
+        name,
+        type,
+        secret,
+        generic_title: titleToSave,
+        generic_body: bodyToSave,
+      });
 
-      if (updateError) throw updateError;
+      if (insertError) throw insertError;
 
       router.push('/dashboard');
       router.refresh();
     } catch (err) {
-      console.error('Error updating endpoint:', err);
-      setError('Erro ao salvar notificação. Tente novamente.');
+      console.error('Error creating endpoint:', err);
+      setError('Erro ao criar notificação. Tente novamente.');
     } finally {
-      setSaving(false);
+      setLoading(false);
     }
   };
 
@@ -142,52 +114,12 @@ export default function EditEndpointPage() {
     }
   };
 
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-cosmic relative flex items-center justify-center">
-        <div className="glow-orb glow-orb-1" />
-        <div className="glow-orb glow-orb-2" />
-        <div className="flex items-center gap-3 text-dark-300">
-          <svg className="animate-spin h-6 w-6" viewBox="0 0 24 24">
-            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
-            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
-          </svg>
-          Carregando...
-        </div>
-      </div>
-    );
-  }
-
-  if (!endpoint) {
-    return (
-      <div className="min-h-screen bg-cosmic relative">
-        <div className="glow-orb glow-orb-1" />
-        <div className="glow-orb glow-orb-2" />
-        <Header />
-        <main className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-8 pb-24 sm:pb-8 relative z-10">
-          <div className="card text-center py-12">
-            <p className="text-dark-300">Notificação não encontrada.</p>
-            <button onClick={() => router.push('/dashboard')} className="btn-primary mt-4">
-              Voltar ao Dashboard
-            </button>
-          </div>
-        </main>
-      </div>
-    );
-  }
-
   return (
-    <div className="min-h-screen bg-cosmic relative">
-      <div className="glow-orb glow-orb-1" />
-      <div className="glow-orb glow-orb-2" />
-      
-      <Header />
-      
       <main className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-8 pb-24 sm:pb-8 relative z-10">
         <div className="mb-8">
-          <h1 className="text-2xl sm:text-3xl font-bold text-dark-50">Editar Notificação</h1>
+          <h1 className="text-2xl sm:text-3xl font-bold text-dark-50">Nova Notificação</h1>
           <p className="text-dark-300 mt-1">
-            Atualize as configurações desta notificação
+            Configure uma nova notificação para receber alertas
           </p>
         </div>
 
@@ -206,6 +138,9 @@ export default function EditEndpointPage() {
               required
               className="input"
             />
+            <p className="text-xs text-dark-400 mt-2">
+              Um nome para identificar esta notificação
+            </p>
           </div>
 
           {/* Type Selection */}
@@ -303,6 +238,9 @@ export default function EditEndpointPage() {
                   className="input resize-none"
                 />
               </div>
+              <p className="text-xs text-dark-400">
+                Estes textos serão exibidos sempre que o webhook for acionado.
+              </p>
             </div>
           )}
 
@@ -355,23 +293,23 @@ export default function EditEndpointPage() {
           <div className="flex items-center gap-4">
             <button
               type="submit"
-              disabled={saving || !name || (type === 'generic' && (!genericTitle || !genericBody))}
+              disabled={loading || !name || (type === 'generic' && (!genericTitle || !genericBody))}
               className="btn-primary flex-1 flex items-center justify-center gap-2"
             >
-              {saving ? (
+              {loading ? (
                 <>
                   <svg className="animate-spin h-5 w-5" viewBox="0 0 24 24">
                     <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
                     <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
                   </svg>
-                  Salvando...
+                  Criando...
                 </>
               ) : (
                 <>
                   <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
                   </svg>
-                  Salvar Alterações
+                  Criar Notificação
                 </>
               )}
             </button>
@@ -385,6 +323,5 @@ export default function EditEndpointPage() {
           </div>
         </form>
       </main>
-    </div>
   );
 }
