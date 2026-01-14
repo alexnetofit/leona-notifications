@@ -15,6 +15,8 @@ export default function SettingsContent({ user, subscriptions }: SettingsContent
   const router = useRouter();
   const supabase = createClient();
   const [loading, setLoading] = useState<number | null>(null);
+  const [verifying, setVerifying] = useState(false);
+  const [verifyResult, setVerifyResult] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
 
   const handleRemoveSubscription = async (id: number) => {
     setLoading(id);
@@ -25,6 +27,29 @@ export default function SettingsContent({ user, subscriptions }: SettingsContent
       console.error('Error removing subscription:', err);
     } finally {
       setLoading(null);
+    }
+  };
+
+  const handleVerifyDevices = async () => {
+    setVerifying(true);
+    setVerifyResult(null);
+    try {
+      const response = await fetch('/api/push/verify', { method: 'POST' });
+      const data = await response.json();
+      
+      if (data.success) {
+        setVerifyResult({ message: data.message, type: 'success' });
+        if (data.removed > 0) {
+          router.refresh();
+        }
+      } else {
+        setVerifyResult({ message: data.error || 'Erro ao verificar', type: 'error' });
+      }
+    } catch (err) {
+      console.error('Error verifying devices:', err);
+      setVerifyResult({ message: 'Erro ao verificar dispositivos', type: 'error' });
+    } finally {
+      setVerifying(false);
     }
   };
 
@@ -129,19 +154,55 @@ export default function SettingsContent({ user, subscriptions }: SettingsContent
 
       {/* Push Subscriptions Section */}
       <section className="card">
-        <div className="flex items-center gap-3 mb-4">
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500/20 to-indigo-600/20 flex items-center justify-center text-blue-400">
-            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
-            </svg>
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500/20 to-indigo-600/20 flex items-center justify-center text-blue-400">
+              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+              </svg>
+            </div>
+            <div>
+              <h2 className="text-lg font-semibold text-dark-50">Dispositivos Registrados</h2>
+              <p className="text-sm text-dark-400">
+                Dispositivos que receberão notificações push
+              </p>
+            </div>
           </div>
-          <div>
-            <h2 className="text-lg font-semibold text-dark-50">Dispositivos Registrados</h2>
-            <p className="text-sm text-dark-400">
-              Dispositivos que receberão notificações push
-            </p>
-          </div>
+          {subscriptions.length > 0 && (
+            <button
+              onClick={handleVerifyDevices}
+              disabled={verifying}
+              className="px-3 py-1.5 text-sm font-medium text-accent-light hover:text-accent hover:bg-accent/10 rounded-lg transition-all disabled:opacity-50 flex items-center gap-2"
+            >
+              {verifying ? (
+                <>
+                  <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                  </svg>
+                  Verificando...
+                </>
+              ) : (
+                <>
+                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  Verificar
+                </>
+              )}
+            </button>
+          )}
         </div>
+        
+        {verifyResult && (
+          <div className={`mb-4 p-3 rounded-lg text-sm ${
+            verifyResult.type === 'success' 
+              ? 'bg-green-500/10 border border-green-500/20 text-green-400'
+              : 'bg-red-500/10 border border-red-500/20 text-red-400'
+          }`}>
+            {verifyResult.message}
+          </div>
+        )}
         
         {subscriptions.length > 0 ? (
           <div className="space-y-3">
