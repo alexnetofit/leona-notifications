@@ -132,6 +132,7 @@ async function handleWebhook(request: NextRequest, endpointId: string) {
   // Send push notifications to all devices
   let sent = false;
   let errorMessage: string | null = null;
+  const invalidSubscriptionIds: number[] = [];
 
   if (subscriptions && subscriptions.length > 0) {
     const notificationPayload = buildNotificationPayload(title, body);
@@ -139,7 +140,7 @@ async function handleWebhook(request: NextRequest, endpointId: string) {
     const results = await Promise.all(
       (subscriptions as PushSubscription[]).map(async (sub) => {
         try {
-          return await sendPushNotification(
+          const result = await sendPushNotification(
             {
               endpoint: sub.endpoint,
               p256dh: sub.p256dh,
@@ -147,6 +148,13 @@ async function handleWebhook(request: NextRequest, endpointId: string) {
             },
             notificationPayload
           );
+          
+          // Mark subscription for removal if it's invalid (app uninstalled)
+          if (result.gone) {
+            invalidSubscriptionIds.push(sub.id);
+          }
+          
+          return result.success;
         } catch (err) {
           console.error('Push error for subscription:', sub.id, err);
           return false;
@@ -157,6 +165,15 @@ async function handleWebhook(request: NextRequest, endpointId: string) {
     sent = results.some(Boolean);
     if (!sent) {
       errorMessage = 'Falha ao enviar para todos os dispositivos';
+    }
+    
+    // Remove invalid subscriptions (app was uninstalled)
+    if (invalidSubscriptionIds.length > 0) {
+      console.log('Removing invalid subscriptions:', invalidSubscriptionIds);
+      await supabase
+        .from('push_subscriptions')
+        .delete()
+        .in('id', invalidSubscriptionIds);
     }
   } else {
     errorMessage = 'Nenhum dispositivo registrado';

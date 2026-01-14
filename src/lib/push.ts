@@ -16,10 +16,15 @@ export interface PushSubscriptionData {
   auth: string;
 }
 
+export interface PushResult {
+  success: boolean;
+  gone?: boolean; // true if 410/404 error (subscription invalid - app uninstalled)
+}
+
 export async function sendPushNotification(
   subscription: PushSubscriptionData,
   payload: NotificationPayload
-): Promise<boolean> {
+): Promise<PushResult> {
   try {
     await webpush.sendNotification(
       {
@@ -31,10 +36,18 @@ export async function sendPushNotification(
       },
       JSON.stringify(payload)
     );
-    return true;
-  } catch (error) {
+    return { success: true };
+  } catch (error: unknown) {
+    const statusCode = (error as { statusCode?: number })?.statusCode;
+    
+    // 410 Gone or 404 = subscription invalid (app uninstalled)
+    if (statusCode === 410 || statusCode === 404) {
+      console.log('Subscription expired/invalid, marking for removal');
+      return { success: false, gone: true };
+    }
+    
     console.error('Error sending push notification:', error);
-    return false;
+    return { success: false };
   }
 }
 
