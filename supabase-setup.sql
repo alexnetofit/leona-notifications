@@ -27,9 +27,13 @@ CREATE TABLE IF NOT EXISTS push_subscriptions (
   p256dh TEXT NOT NULL,
   auth TEXT NOT NULL,
   user_agent TEXT,
+  device_id TEXT,
   created_at TIMESTAMPTZ DEFAULT NOW(),
   UNIQUE(user_id, endpoint)
 );
+
+-- MIGRAÇÃO: Se a tabela já existe, adicione a coluna device_id
+-- ALTER TABLE push_subscriptions ADD COLUMN IF NOT EXISTS device_id TEXT;
 
 -- Tabela de logs de webhook
 CREATE TABLE IF NOT EXISTS webhook_logs (

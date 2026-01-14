@@ -19,6 +19,20 @@ export default function PushPermission({ onSubscribed }: PushPermissionProps) {
     setPermission(Notification.permission);
   }, []);
 
+  // Get or create a unique device ID that persists across reinstalls
+  const getDeviceId = (): string => {
+    const DEVICE_ID_KEY = 'leona_device_id';
+    let deviceId = localStorage.getItem(DEVICE_ID_KEY);
+    
+    if (!deviceId) {
+      // Generate a unique ID for this device/browser
+      deviceId = `${Date.now()}-${Math.random().toString(36).substring(2, 15)}`;
+      localStorage.setItem(DEVICE_ID_KEY, deviceId);
+    }
+    
+    return deviceId;
+  };
+
   const subscribeToPush = async () => {
     setLoading(true);
     setError(null);
@@ -45,12 +59,15 @@ export default function PushPermission({ onSubscribed }: PushPermissionProps) {
         applicationServerKey: urlBase64ToUint8Array(vapidPublicKey) as BufferSource,
       });
 
+      const deviceId = getDeviceId();
+
       const response = await fetch('/api/push/subscribe', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           subscription: subscription.toJSON(),
           userAgent: navigator.userAgent,
+          deviceId,
         }),
       });
 
