@@ -53,12 +53,23 @@ export default function LoginPage() {
         type: 'success',
         text: 'Código enviado! Verifique seu email.',
       });
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('OTP error:', error);
-      setMessage({
-        type: 'error',
-        text: 'Erro ao enviar código. Tente novamente.',
-      });
+      
+      // Check for rate limit error
+      const errorMessage = error instanceof Error ? error.message : '';
+      if (errorMessage.includes('security purposes') || errorMessage.includes('rate limit')) {
+        const seconds = errorMessage.match(/after (\d+) seconds/)?.[1] || '60';
+        setMessage({
+          type: 'error',
+          text: `Aguarde ${seconds} segundos antes de solicitar outro código.`,
+        });
+      } else {
+        setMessage({
+          type: 'error',
+          text: 'Erro ao enviar código. Tente novamente.',
+        });
+      }
     } finally {
       setLoading(false);
     }
@@ -159,12 +170,24 @@ export default function LoginPage() {
         text: 'Novo código enviado!',
       });
       inputRefs.current[0]?.focus();
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Resend error:', error);
-      setMessage({
-        type: 'error',
-        text: 'Erro ao reenviar código.',
-      });
+      
+      // Check for rate limit error
+      const errorMessage = error instanceof Error ? error.message : '';
+      if (errorMessage.includes('security purposes') || errorMessage.includes('rate limit')) {
+        const seconds = errorMessage.match(/after (\d+) seconds/)?.[1] || '60';
+        setCountdown(parseInt(seconds));
+        setMessage({
+          type: 'error',
+          text: `Aguarde ${seconds} segundos antes de reenviar.`,
+        });
+      } else {
+        setMessage({
+          type: 'error',
+          text: 'Erro ao reenviar código. Tente novamente.',
+        });
+      }
     } finally {
       setLoading(false);
     }
