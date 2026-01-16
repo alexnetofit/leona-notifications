@@ -9,7 +9,7 @@ export default function LoginPage() {
   const router = useRouter();
   const [email, setEmail] = useState('');
   const [otp, setOtp] = useState(['', '', '', '', '', '']);
-  const [step, setStep] = useState<'email' | 'otp'>('email');
+  const [step, setStep] = useState<'email' | 'otp' | 'no-subscription'>('email');
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
   const [countdown, setCountdown] = useState(0);
@@ -32,12 +32,40 @@ export default function LoginPage() {
     }
   }, [step]);
 
+  // Check Stripe subscription before sending OTP
+  const checkSubscription = async (userEmail: string): Promise<boolean> => {
+    try {
+      const response = await fetch('/api/stripe/check-subscription', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: userEmail }),
+      });
+
+      const data = await response.json();
+      return data.hasActiveSubscription === true;
+    } catch (error) {
+      console.error('Subscription check error:', error);
+      // In case of error, allow login (fail open)
+      return true;
+    }
+  };
+
   const handleSendOtp = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setMessage(null);
 
     try {
+      // First, check Stripe subscription
+      const hasSubscription = await checkSubscription(email);
+      
+      if (!hasSubscription) {
+        setStep('no-subscription');
+        setLoading(false);
+        return;
+      }
+
+      // If subscription is active, proceed with OTP
       const { error } = await supabase.auth.signInWithOtp({
         email,
         options: {
@@ -287,7 +315,7 @@ export default function LoginPage() {
                       <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
                       <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
                     </svg>
-                    Enviando...
+                    Verificando...
                   </span>
                 ) : (
                   <span className="flex items-center justify-center gap-2">
@@ -305,6 +333,47 @@ export default function LoginPage() {
                 </p>
               </div>
             </form>
+          ) : step === 'no-subscription' ? (
+            // Step: No Subscription
+            <div className="text-center py-4">
+              <div className="w-16 h-16 mx-auto mb-6 rounded-full bg-amber-500/20 flex items-center justify-center">
+                <svg className="w-8 h-8 text-amber-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                </svg>
+              </div>
+              
+              <h2 className="text-xl font-semibold text-dark-50 mb-3">
+                Assinatura não encontrada
+              </h2>
+              
+              <p className="text-dark-300 mb-6">
+                Não foi encontrada uma assinatura ativa do Leona para o email <span className="text-accent-light">{email}</span>.
+              </p>
+              
+              <p className="text-dark-400 text-sm mb-6">
+                Para utilizar o Leona Notifications, é necessário ter uma assinatura ativa.
+              </p>
+
+              <a
+                href="https://leonasolutions.io/register"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="btn-primary w-full inline-flex items-center justify-center gap-2"
+              >
+                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
+                </svg>
+                Fazer cadastro
+              </a>
+
+              <button
+                type="button"
+                onClick={handleBack}
+                className="mt-4 text-sm text-dark-400 hover:text-accent-light transition-colors cursor-pointer"
+              >
+                Tentar com outro email
+              </button>
+            </div>
           ) : (
             // Step 2: OTP Code
             <form onSubmit={handleVerifyOtp} className="space-y-6 relative z-10">
