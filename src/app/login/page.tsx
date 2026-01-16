@@ -355,7 +355,7 @@ export default function LoginPage() {
               </p>
 
               <a
-                href="https://leonasolutions.io/register"
+                href="https://app.leonasolutions.io/register"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="btn-primary w-full inline-flex items-center justify-center gap-2"
@@ -366,13 +366,15 @@ export default function LoginPage() {
                 Fazer cadastro
               </a>
 
-              <button
-                type="button"
-                onClick={handleBack}
-                className="mt-4 text-sm text-dark-400 hover:text-accent-light transition-colors cursor-pointer"
-              >
-                Tentar com outro email
-              </button>
+              <div className="mt-4 text-center">
+                <button
+                  type="button"
+                  onClick={handleBack}
+                  className="text-sm text-dark-400 hover:text-accent-light transition-colors cursor-pointer relative z-20"
+                >
+                  Tentar com outro email
+                </button>
+              </div>
             </div>
           ) : (
             // Step 2: OTP Code
@@ -496,7 +498,7 @@ export default function LoginPage() {
         </div>
 
         {/* Footer */}
-        <p className="text-center text-dark-500 text-xs mt-8">
+        <p className="text-center text-dark-500 text-xs mt-8 mb-6">
           © {new Date().getFullYear()} Leona Notifications
         </p>
       </div>
