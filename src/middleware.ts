@@ -13,8 +13,8 @@ export const config = {
      * - _next/image (image optimization files)
      * - favicon.ico (favicon file)
      * - public folder
-     * - api/webhook (webhook endpoints)
+     * - api routes (public API endpoints)
      */
-    '/((?!_next/static|_next/image|favicon.ico|image|manifest.json|sw.js|api/webhook|api/utmify).*)',
+    '/((?!_next/static|_next/image|favicon.ico|image|manifest.json|sw.js|api/).*)',
   ],
 };
