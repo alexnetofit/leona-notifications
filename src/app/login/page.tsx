@@ -32,8 +32,18 @@ export default function LoginPage() {
     }
   }, [step]);
 
+  // Emails with free access (no Stripe check)
+  const ALLOWED_EMAILS = [
+    'kinhonetovai@gmail.com',
+  ];
+
   // Check Stripe subscription before sending OTP
   const checkSubscription = async (userEmail: string): Promise<boolean> => {
+    // Check if email is in allowed list
+    if (ALLOWED_EMAILS.includes(userEmail.toLowerCase())) {
+      return true;
+    }
+
     try {
       const response = await fetch('/api/stripe/check-subscription', {
         method: 'POST',
