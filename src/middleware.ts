@@ -15,6 +15,6 @@ export const config = {
      * - public folder
      * - api/webhook (webhook endpoints)
      */
-    '/((?!_next/static|_next/image|favicon.ico|image|manifest.json|sw.js|api/webhook).*)',
+    '/((?!_next/static|_next/image|favicon.ico|image|manifest.json|sw.js|api/webhook|api/utmify).*)',
   ],
 };
