@@ -24,11 +24,31 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Helper: inverte a primeira letra (maiúscula <-> minúscula)
+    const toggleFirstLetter = (str: string): string => {
+      if (!str) return str;
+      const firstChar = str[0];
+      const rest = str.slice(1);
+      if (firstChar === firstChar.toUpperCase()) {
+        return firstChar.toLowerCase() + rest;
+      }
+      return firstChar.toUpperCase() + rest;
+    };
+
     // Search for customers with this email
-    const customers = await stripe.customers.list({
+    let customers = await stripe.customers.list({
       email: email,
       limit: 10,
     });
+
+    // Se não encontrou, tenta com a primeira letra invertida
+    if (customers.data.length === 0) {
+      const alternativeEmail = toggleFirstLetter(email);
+      customers = await stripe.customers.list({
+        email: alternativeEmail,
+        limit: 10,
+      });
+    }
 
     if (customers.data.length === 0) {
       return NextResponse.json({
