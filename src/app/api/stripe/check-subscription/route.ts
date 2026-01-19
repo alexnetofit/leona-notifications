@@ -26,7 +26,7 @@ export async function POST(request: NextRequest) {
 
     // Search for customers with this email
     const customers = await stripe.customers.list({
-      email: email.toLowerCase(),
+      email: email,
       limit: 10,
     });
 
