@@ -286,7 +286,7 @@ export default function LoginPage() {
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="seu@email.com"
                   required
-                  className="input"
+                  className="input relative z-20"
                   disabled={loading}
                 />
               </div>
